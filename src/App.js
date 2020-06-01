@@ -25,9 +25,15 @@ import {
   FormGroup,
   Form,
   Input,
-  Label
+  Label,
+  Navbar,
 
 } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLinkedinIn, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faGlobe } from '@fortawesome/free-solid-svg-icons';
+import './tempesttheme.css'
+import './App.css';
 
 
 
@@ -36,14 +42,10 @@ function App() {
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState();
   const [zip, setZip] = useState("");
-  const [loc, setLoc] = useState("");
   const [unit, setUnit] = useState("f");
   const [validated, setValidated] = useState();
   const [googleMapsReady, setGoogleMapsReady] = useState(false);
 
-  var weather = {};
-  console.log("zip: ",zip);
-  console.log("loaded: ", loaded);
 
   useEffect(() => {
     const loadGoogleMaps = (callback) => {
@@ -67,11 +69,10 @@ function App() {
 
   const validate = (e) => {
     e.preventDefault();
-    if (zip.length==5){
+    if (zip.length == 5) {
       retrieveLatLng();
       setValidated(true);
-        }else
-        {setValidated(false)}
+    } else { setValidated(false) }
   }
 
   const retrieveLatLng = async (props) => {
@@ -83,14 +84,13 @@ function App() {
 
   const phoneHome = async (latLng) => {
     await axios.get("https://api.openweathermap.org/data/2.5/onecall?lat=" + latLng.lat + "&lon=" + latLng.lng + "&appid=b9cb3cec77c14b5037dec0def981f206")
-      .then(response => 
+      .then(response =>
         setWeather(response.data)
-        // console.log(response)
-        )
-        .catch(error => console.log(error))
+      )
+      .catch(error => console.log(error))
   };
 
-  const setWeather =  async(response) => {
+  const setWeather = async (response) => {
     console.log(response)
     await setData(response);
     await setLoaded(true);
@@ -104,10 +104,7 @@ function App() {
 
 
   const suns = (suntime) => {
-    console.log(suntime);
-    debugger;
-        var stime = new Date(suntime*1000)
-        debugger;
+    var stime = new Date(suntime * 1000)
     return (stime.toLocaleTimeString());
 
   }
@@ -120,101 +117,109 @@ function App() {
   }
 
   return (
-    <Container className="mt-5">
-      <Card>
-        <CardTitle className="mt-3"><h3>Tempest Prognosticator</h3></CardTitle>
-        <CardSubtitle><h5>Lightweight Weather</h5></CardSubtitle>
-        <CardBody>
-          {loaded == false && googleMapsReady && (<Form>
-            <FormGroup>
-              <Label for="zipField">Enter your zip code</Label>
-              <Input type="number" name="zipField" id="zipField" placeholder="40515" onChange={(e)=>setZip(e.target.value)} value={zip} />
-              {validated==false && <p>Please enter a valid zip code</p>}
-            </FormGroup>
-            <Button onClick={(e) => {validate(e)}}>Get Weather</Button>
-          </Form>)}
-          {loaded == true && (<Button onClick={(e)=>{reset(e)}}>Search Again</Button>)}
-        </CardBody>
-      </Card>
-      {loaded == true && (
-        <Container>
-          <Card>
-            <CardTitle>
-              <Col><h5 className="text-center">Current Temperature</h5>
 
-                  <Button className="float-right" onClick={() => { unit == "f" ? setUnit("c") : setUnit("f") }}>{unit == "f" ? <>&#8451;</> : (<>&#8457;</>)}</Button>
-                </Col>
-            </CardTitle>
-            <CardBody><CardText>
-              <Row>
-                <Col>
-                  <h6>Real Temp</h6>
-                  {setTemp(data.current.temp)}{unit=="f"? <sup>&#8457;</sup>:<sup>&#8451;</sup>}
-                </Col>
-                <Col>
-                  <h6>Feels Like</h6>
-                  {setTemp(data.current.feels_like)}{unit=="f"? <sup>&#8457;</sup>:<sup>&#8451;</sup>}
-                </Col>
-                <Col><h6>Humidity</h6>
-                {data.current.humidity}%
-                </Col>
-              </Row></CardText>
-            </CardBody>
-          </Card>
+
+
+    <Container className="mt-3 mx-auto justify-content-center">
+      <Row>
+        <Col className="col-md-5 text-center mx-auto">
           <Card>
-            <CardTitle>
-            <h5>Current Weather</h5>
-            </CardTitle>
+            <CardTitle className="mt-3"><h3>Tempest Prognosticator</h3></CardTitle>
+            <CardSubtitle><h5>A Lightweight Weather App</h5></CardSubtitle>
             <CardBody>
-              <CardText>
-              <Row>
-                <Col>
-              {/* <p>{data.current.weather[0].main}</p> */}
-                <img src={"http://openweathermap.org/img/w/" + data.current.weather[0].icon + ".png"} />
-                <p>{data.current.weather[0].description}</p>
-
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <h6>Cloud Cover</h6>
-                  {data.current.clouds}%
-                </Col>
-                <Col>
-                  <h6>Visibility</h6>
-                  {Math.round(data.current.visibility * 0.000621371)} miles
-                </Col>
-
-                <Col>
-                  <h6>Winds</h6>
-                  {Math.round(data.current.wind_speed * 2.23694)} MPH
-                </Col>
-              </Row>              
-              <Row>
-                <Col>
-                  <h6>Sunrise</h6>
-                  {suns(data.current.sunrise)}
-                </Col>
-                <Col>
-                  <h6>Sunset</h6>
-                  {suns(data.current.sunset)}
-                </Col>
-              </Row>
-              </CardText>
+              {loaded == false && googleMapsReady && (<Form onSubmit={(e) => { validate(e) }}>
+                <FormGroup>
+                  <Label for="zipField">Enter your zip code</Label>
+                  <Col className="col-md-5 mx-auto">
+                    <Input type="number" name="zipField" id="zipField" placeholder="40515" onChange={(e) => setZip(e.target.value)} value={zip} />
+                  </Col>
+                  {validated == false && <p className="text-danger">Please enter a valid zip code</p>}
+                </FormGroup>
+                <Button type="submit" >Get Weather</Button>
+              </Form>)}
+              {loaded == true && (<><Button type="button" onClick={(e) => { reset(e) }}>Search Again</Button><br/>
+              <Button className="mt-2" type="button" onClick={() => { unit == "f" ? setUnit("c") : setUnit("f") }}>{unit == "f" ? <>&#8451;</> : (<>&#8457;</>)}</Button>
+              </>)}
             </CardBody>
           </Card>
-          <Card>
-            <CardTitle>
+          {loaded == true && (
+            <>
+              <Card className="text-center">
+                <CardTitle className="mt-2">
+                  <Col>
+                    
+                  <h5 className="text-center">Current Temperature</h5>
+                  </Col>
+                </CardTitle>
+                <CardBody><CardText>
+                  <Row>
+                    <Col className="text-center">
+                      <h6>Real Temp</h6>
+                      {setTemp(data.current.temp)}{unit == "f" ? <sup>&#8457;</sup> : <sup>&#8451;</sup>}
+                    </Col>
+                    <Col className="text-center">
+                      <h6>Feels Like</h6>
+                      {setTemp(data.current.feels_like)}{unit == "f" ? <sup>&#8457;</sup> : <sup>&#8451;</sup>}
+                    </Col>
+                    <Col className="text-center"><h6>Humidity</h6>
+                      {data.current.humidity}%
+                </Col>
+                  </Row></CardText>
+                </CardBody>
+              </Card>
+              <Card>
+                <CardTitle className="mt-2" id="weatherTitle">
+                  <h5 className="text-center">Current Weather</h5>
+                </CardTitle>
+                <CardBody id="weatherBody">
+                  <CardText>
+                    <Row>
+                      <Col className="text-center">
+                        <img src={"http://openweathermap.org/img/w/" + data.current.weather[0].icon + ".png"} />
+                        <p>{data.current.weather[0].description}</p>
 
-            </CardTitle>
-            <CardBody>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="text-center">
+                        <h6>Cloud Cover</h6>
+                        {data.current.clouds}%
+                </Col>
+                      <Col className="text-center">
+                        <h6>Visibility</h6>
+                        {Math.round(data.current.visibility * 0.000621371)} miles
+                </Col>
 
-            </CardBody>
-          </Card>
-        </Container>
-      )
+                      <Col className="text-center">
+                        <h6>Winds</h6>
+                        {Math.round(data.current.wind_speed * 2.23694)} MPH
+                </Col>
+                    </Row>
+                    <Row className="mt-2">
+                      <Col className="text-center">
+                        <h6>Sunrise</h6>
+                        {suns(data.current.sunrise)}
+                      </Col>
+                      <Col className="text-center">
+                        <h6>Sunset</h6>
+                        {suns(data.current.sunset)}
+                      </Col>
+                    </Row>
+                  </CardText>
+                </CardBody>
+              </Card>
+              </>
+          )
 
-      }
+          }
+        </Col>
+      </Row>
+      <Navbar color="primary" className="fixed-bottom justify-content-center">
+          <FontAwesomeIcon href="https://www.linkedin.com/in/armiller-lexky" icon={faLinkedinIn} className="ml-5 mr-3 text-light" />
+          <FontAwesomeIcon href="https://github.com/AllisonRMiller/tempest-prognosticator" icon={faGithub} className="mr-3 text-light" />
+          <FontAwesomeIcon href="" icon={faGlobe} className="text-light" />
+
+      </Navbar>
     </Container>
 
   );
